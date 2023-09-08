@@ -1,0 +1,32 @@
+{% extends 'includes/layout.html' %}
+
+{% block body %}
+<main class="container">
+
+  <div class="bg-light p-5 rounded mt-5">
+    <h1 class="display-11 mb-2"><b>Contribute Your Items to the Community</b></h1>
+
+    <p class="lead mb-5">Entering the quantity and type of your recyclables.</p>
+
+    <form method="POST" enctype="multipart/form-data" action="/ai-prompt" class="mb-4">
+      <div class="mb-3">
+        <label class="form-label">Upload an image</label>
+        <input type="file" class="form-control" name="file">
+      </div>
+      <button type="submit" class="btn btn-primary">Upload Image</button>
+    </form>
+
+    <div class="p-3 rounded bg-white">
+      {% if prompt %}
+        <h3 class="text-primary mb-3">{{prompt}}</h3>
+      {% endif %}
+
+      {% if openAIAnswer %}
+        <p class="lead">{{openAIAnswer}}</p>
+      {% endif %}
+    </div>
+
+  </div>
+
+</main>
+{% endblock %}

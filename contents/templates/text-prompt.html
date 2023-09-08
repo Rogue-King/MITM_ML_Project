@@ -1,0 +1,41 @@
+{% extends 'includes/layout.html' %}
+
+{% block body %}
+<main class="container">
+  <div class="header">
+    <img src="//Users/elenachoochoo/Desktop/hackathon2023/contents/templates/static/images/home.jpg" alt="Header Image">
+    <div class="bg-light p-5 rounded mt-5">
+      <h1>Generate DIY Project Ideas ️</h1>
+      <p class="lead">
+        Generate diy projects by entering the quantity and type of your recycleables. 
+      </p>
+
+      <h2>Enter the </h2>
+
+      <form class="" action="/text-prompt" method="post">
+
+        <div class="mb-3">
+          <label class="form-label">Product Title</label>
+          <input type="text" class="form-control" name="textPrompt" placeholder="eg. 1 plastic water bottle, 2 glass bottles, 3 toothpicks">
+          <div class="form-text">Enter the quantity and name of the items you would like to hear about.</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg"> Recommendations </button>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- <ai stuff? -->
+
+  <div class="p-3 rounded">
+    <div class="row">
+      <div class="col-lg-12">
+        <h3 class="text-primary">{{prompt}}</h3>
+        <p class="lead">{{openAIAnswer}}</p>
+
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

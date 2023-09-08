@@ -1,0 +1,39 @@
+{% extends 'includes/layout.html' %}
+
+{% block body %}
+<main class="container-fluid d-flex align-items-center justify-content-center" style="background-image: url('/static/images/home.jpg'); background-size: cover; height: 100vh;">
+  <div class="bg-light p-5 rounded">
+    <h1 class="text-center mb-5">Junk2Jive</h1>
+    <p class="lead text-center mb-5">Junk2Jive is a web application created in Flask that can be used to generate DIY projects using AI API from OpenAI</p>
+    <p class="lead text-center mb-5">You can use Junk2Jive to get ideas on how to turn your everyday recyclables, or otherwise useless objects, into...</p>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-3 mb-3">
+        <div class="card">
+          <div class="card-header">
+            Written Prompt
+          </div>
+          <div class="card-body">
+            <h5 class="card-title"> </h5>
+            <p class="card-text">Generate DIY projects for your everyday items, just enter the quantity of your items and the name...</p>
+            <a href="/text-prompt" class="btn btn-primary">Get Started</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 mb-3">
+        <div class="card">
+          <div class="card-header">
+            AI PROMPT
+          </div>
+          <div class="card-body">
+            <h5 class="card-title"> </h5>
+            <p class="card-text">Generate DIY projects for your everyday items, just enter the quantity of your items and the name...</p>
+            <a href="/ai-prompt" class="btn btn-primary">Get Started</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
