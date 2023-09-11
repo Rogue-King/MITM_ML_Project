@@ -27,3 +27,4 @@ print(f"Accuracy: {accuracy}")
 # Generate a classification report for more detailed metrics
 report = classification_report(y_test, y_pred)
 print(report)
+
