@@ -9,10 +9,6 @@ def create_app():
     app.register_blueprint(homepage)
     app.register_blueprint(history, url_prefix="/history")
 
-    @app.route('/static/js/<filename>')
-    def serve_js(filename):
-        return send_from_directory('webapp/views/static/js/', filename)
-    
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template('404.html'), 404
