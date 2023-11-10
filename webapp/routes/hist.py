@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect
 
-history = Blueprint("history", __name__, template_folder="templates/", static_folder="static/")
+history = Blueprint("history", __name__, template_folder="../views/templates/", static_folder="../views/static/")
 
 @history.route('/')
 def default_page():

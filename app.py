@@ -1,18 +1,20 @@
 # Importing the necessary modules and libraries
-from flask import Flask, send_from_directory, render_template
+from flask import Flask, render_template
 
-from webapp.views.home import homepage
-from webapp.views.hist import history
+from webapp.routes.home import homepage
+from webapp.routes.hist import history
+from webapp.routes.upload import upload
 
 def create_app():
     app = Flask(__name__, template_folder='webapp/views/templates/')  # flask app object
     app.register_blueprint(homepage)
     app.register_blueprint(history, url_prefix="/history")
+    app.register_blueprint(upload, url_prefix="/upload")
+
 
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template('404.html'), 404
-
 
     return app
 
