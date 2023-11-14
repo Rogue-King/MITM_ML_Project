@@ -5,12 +5,14 @@ from webapp.routes.home import homepage
 from webapp.routes.hist import history
 from webapp.routes.upload import upload
 
+import os
+
 def create_app():
     app = Flask(__name__, template_folder='webapp/views/templates/')  # flask app object
     app.register_blueprint(homepage)
     app.register_blueprint(history, url_prefix="/history")
     app.register_blueprint(upload, url_prefix="/upload")
-
+    app.secret_key = os.urandom(24);
 
     @app.errorhandler(404)
     def page_not_found(e):

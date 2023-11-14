@@ -1,17 +1,25 @@
 import os
-from flask import redirect
+from flask import render_template, redirect, request, flash
 from werkzeug.utils import secure_filename
-
 
 ALLOWED_EXTENSIONS = {".pcap", ".PCAP"}
 
-def upload_file(file):
-    if file.filename == '':
-        return redirect("/");
+def file_upload_success():
+    if 'pcap-upload' not in request.files:
+        flash('Could not find file uploaded')
+        return False
+        
+    pcap_file = request.files['pcap-upload']
+    
+    if pcap_file.filename == '':
+        flash('Invalid filename uploaded')
+        return False
 
-    if os.path.splitext(file.filename)[1] in ALLOWED_EXTENSIONS:
-        filename = secure_filename(file.filename)
-        file.save(os.path.join("webapp/file_uploads", filename))
-        return redirect("/Upload_Success"); # Redirect to side by side view
+    if os.path.splitext(pcap_file.filename)[1] not in ALLOWED_EXTENSIONS:
+        flash('File is not a recognized format. Please upload .pcap files only')
+        return False
 
-    return redirect("/Failed");
+    filename = secure_filename(pcap_file.filename)
+    pcap_file.save(os.path.join("webapp/file_uploads", filename))
+    flash(f'Uploaded {filename} successfully')
+    return True

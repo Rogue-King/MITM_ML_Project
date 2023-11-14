@@ -1,16 +1,13 @@
-from flask import Blueprint, redirect, request
+from flask import Blueprint, redirect, url_for
 from webapp.controllers.upload_controller import *
 
 upload = Blueprint("upload", __name__, template_folder="../views/templates/", static_folder="../views/static/")
 
-@upload.route('/', methods=["POST"])
+@upload.route('/', methods=["GET", "POST"])
 def default_page():
-    if request.method == "POST":
-        if 'pcap-upload' not in request.files:
-            return redirect("/FileNotFound")
+    if request.method == "POST" and file_upload_success():
         
-        pcap_file = request.files['pcap-upload']
+        return render_template("packet_data_display.html") 
 
-        return upload_file(pcap_file)
     else: 
-        return redirect("/404")
+        return redirect('/')
