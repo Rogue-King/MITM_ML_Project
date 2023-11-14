@@ -26,16 +26,23 @@
               <h5 class="modal-title" id="modal-title">Upload Files Here</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <form action="/upload" method="post" enctype="multipart/form-data">
+          <form onsubmit="showSpinner()" action="/upload" method="post" enctype="multipart/form-data">
             <div class="modal-body">
                   <label for="formFile" class="form-label">Accepts .pcap files</label>
                   <input class="form-control" type="file" id="formFile", name="pcap-upload">
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" id="fileSubmit">Submit</button>
+              <button class="btn btn-primary" id="fileSubmit">Submit</button>
+
+              <button class="btn btn-primary" type="button" disabled id="spinnerBtn" style="display: none;">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span class="visually-hidden">Loading...</span>
+              </button>
             </div>
           </form>
         </div>
     </div>
   </div>
+
+  <script src="{{ url_for('static', filename='loading_button.js') }}"></script>
 {% endblock %}

@@ -9,7 +9,7 @@ from webapp.routes.packet_viewer import packet_viewer
 import os
 
 def create_app():
-    app = Flask(__name__, template_folder='webapp/views/templates/')  # flask app object
+    app = Flask(__name__, template_folder='webapp/views/templates/', static_folder='webapp/views/static/')  # flask app object
     app.register_blueprint(homepage)
     app.register_blueprint(history, url_prefix="/history")
     app.register_blueprint(upload, url_prefix="/upload")
