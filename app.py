@@ -4,6 +4,7 @@ from flask import Flask, render_template
 from webapp.routes.home import homepage
 from webapp.routes.hist import history
 from webapp.routes.upload import upload
+from webapp.routes.packet_viewer import packet_viewer
 
 import os
 
@@ -12,6 +13,7 @@ def create_app():
     app.register_blueprint(homepage)
     app.register_blueprint(history, url_prefix="/history")
     app.register_blueprint(upload, url_prefix="/upload")
+    app.register_blueprint(packet_viewer, url_prefix="/packet-viewer")
     app.secret_key = os.urandom(24);
 
     @app.errorhandler(404)
