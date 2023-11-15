@@ -52,9 +52,7 @@ if __name__ == "__main__":
     agent2_interface = "your_network_interface2"  # Replace with the actual network interface
     agent3_interface = "your_network_interface3"  # Replace with the actual network interface
 
-    target_ip_agent1 = ["ip_of_machine1", "ip_of_machine2", "ip_of_machine3"]
-    target_ip_agent2 = ["ip_of_machine1", "ip_of_machine2", "ip_of_machine3"]
-    target_ip_agent3 = ["ip_of_machine1", "ip_of_machine2", "ip_of_machine3"]
+    target_ip_agent = ["10.21.0.16", "10.21.0.17", "10.21.0.18"]
 
     pcap_file_agent1 = "agent1_traffic.pcap"
     pcap_file_agent2 = "agent2_traffic.pcap"
@@ -64,9 +62,9 @@ if __name__ == "__main__":
     sniff_active_agent2 = threading.Event()
     sniff_active_agent3 = threading.Event()
 
-    agent_listener_thread1 = threading.Thread(target=agent_listener, args=(agent1_interface, target_ip_agent1[0], pcap_file_agent1, sniff_active_agent1))
-    agent_listener_thread2 = threading.Thread(target=agent_listener, args=(agent2_interface, target_ip_agent2[0], pcap_file_agent2, sniff_active_agent2))
-    agent_listener_thread3 = threading.Thread(target=agent_listener, args=(agent3_interface, target_ip_agent3[0], pcap_file_agent3, sniff_active_agent3))
+    agent_listener_thread1 = threading.Thread(target=agent_listener, args=(agent1_interface, target_ip_agent[0], pcap_file_agent1, sniff_active_agent1))
+    agent_listener_thread2 = threading.Thread(target=agent_listener, args=(agent2_interface, target_ip_agent[0], pcap_file_agent2, sniff_active_agent2))
+    agent_listener_thread3 = threading.Thread(target=agent_listener, args=(agent3_interface, target_ip_agent[0], pcap_file_agent3, sniff_active_agent3))
 
     agent_listener_thread1.start()
     agent_listener_thread2.start()
@@ -81,9 +79,9 @@ if __name__ == "__main__":
         sniff_active_agent2.set()
         sniff_active_agent3.set()
 
-        random_target_agent1 = choose_random_target(target_ip_agent1[0], target_ip_agent1)
-        random_target_agent2 = choose_random_target(target_ip_agent2[0], target_ip_agent2)
-        random_target_agent3 = choose_random_target(target_ip_agent3[0], target_ip_agent3)
+        random_target_agent1 = choose_random_target(target_ip_agent[0], target_ip_agent)
+        random_target_agent2 = choose_random_target(target_ip_agent[0], target_ip_agent)
+        random_target_agent3 = choose_random_target(target_ip_agent[0], target_ip_agent)
 
         communicate_with_random_target(agent1_interface, random_target_agent1)
         communicate_with_random_target(agent2_interface, random_target_agent2)
