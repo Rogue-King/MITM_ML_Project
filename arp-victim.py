@@ -16,12 +16,12 @@ pcap_file3 = "capture_Sina3.pcap"
 
 # Start sniffing on the first interface and save to pcap file
 sniff(iface=interface1, prn=packet_handler, store=0, count=10)
-wrpcap(pcap_file1, sniffed_packets)
+wrpcap(pcap_file1, sniffed_packets_maria_1)
 
 # Start sniffing on the second interface and save to pcap file
 sniff(iface=interface2, prn=packet_handler, store=0, count=10)
-wrpcap(pcap_file2, sniffed_packets)
+wrpcap(pcap_file2, sniffed_packets_rose_2)
 
 # Start sniffing on the third interface and save to pcap file
 sniff(iface=interface3, prn=packet_handler, store=0, count=10)
-wrpcap(pcap_file3, sniffed_packets)
+wrpcap(pcap_file3, sniffed_packets_sina_3)
