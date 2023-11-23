@@ -4,7 +4,7 @@ import datetime
 import random
 from scapy.all import sniff, AsyncSniffer, ARP, wrpcap
 
-INTERFACES = ['eth0', 'eth1', 'eth2']
+INTERFACES = ['Melchior', 'Balthazar', 'Caspar']
 
 def process_packet(packet, interface, pcap_filename):
     if ARP in packet:
@@ -15,6 +15,10 @@ def process_packet(packet, interface, pcap_filename):
         packet[ARP].pdst = packet[ARP].pdst + " (malicious)"
 
         wrpcap(pcap_filename, packet, append=True)
+
+def execute_script():
+    # Replace "your_script.sh" with the actual script you want to run
+    subprocess.run(["./python3 arpspoof.py -i --attackermac --targetmac --gateip 10.21.0.5 --interval "])
 
 def sniff_packets(interface, duration):
     start_time = time.time()
@@ -34,6 +38,11 @@ def sniff_packets(interface, duration):
         pass
     finally:
         sniffer.stop_and_wait()
+
+        # Randomly select an agent to execute the script
+        if random.choice([True, False]):
+            print(f"Agent on {interface} interface is executing the script.")
+            execute_script()
 
 def activate_agents(num_agents):
     threads = []
