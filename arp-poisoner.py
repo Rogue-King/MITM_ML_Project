@@ -1,86 +1,90 @@
+import subprocess
 import threading
-import time
-import datetime
 import random
-from scapy.all import sniff, AsyncSniffer, ARP, wrpcap
+import time
+import sys
+from datetime import datetime, timedelta
 
-INTERFACES = ['Melchior', 'Balthazar', 'Caspar']
+INTERFACES = ['Melchior', 'Balthasar', 'Casper']
+TARGET_INTERFACES = ['Maria', 'Rose', 'Sina']
 
-def process_packet(packet, interface, pcap_filename):
-    if ARP in packet:
-        # Process ARP packet and add the label
-        print(f"Received ARP packet on {interface} interface:\n{packet.summary()}")
-        
-        # Add a label of "1" for malicious
-        packet[ARP].pdst = packet[ARP].pdst + " (malicious)"
+# Data structure for agents
+agents_info = {
+    'Melchior': {'interface_mac': 'F6:91:7F:74:12:F6'},
+    'Balthasar': {'interface_mac': 'F2:C7:F1:B6:80:98'},
+    'Casper': {'interface_mac': 'B2:DE:93:F3:CD:F8'}
+}
 
-        wrpcap(pcap_filename, packet, append=True)
+# Data structure for targets
+targets_info = {
+    'Maria': {'target_mac': 'CE:32:51:9F:81:02'},
+    'Rose': {'target_mac': '12:45:6C:CD:58:D6'},
+    'Sina': {'target_mac': 'B2:DA:BF:0C:ED:AB'}
+}
 
-def execute_script():
-    # Replace "your_script.sh" with the actual script you want to run
-    subprocess.run(["./python3 arpspoof.py -i --attackermac --targetmac --gateip 10.21.0.5 --interval "])
+# Number of agents
+num_agents = len(INTERFACES)
 
-def sniff_packets(interface, duration):
-    start_time = time.time()
-    end_time = start_time + duration
+# Lock for the availability of interfaces
+interface_lock = [threading.Lock() for _ in range(num_agents)]
 
-    # Create a unique timestamp for each capture session
-    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-    pcap_filename = f"captured_packets_{interface}_{timestamp}.pcap"
+# Function to simulate code execution on an interface
+def execute_code(agent_id, target_interface): # ARP-poison script: https://github.com/EONRaider/Arp-Spoofer
+    agent_name = INTERFACES[agent_id]
+    agent_interface_mac = agents_info[agent_name]['interface_mac']
 
-    sniffer = AsyncSniffer(iface=interface, prn=lambda pkt: process_packet(pkt, interface, pcap_filename))
-    sniffer.start()
+    with interface_lock[agent_id]:
+        print(f"Agent {agent_name} ({agent_id}) is executing code on {target_interface}.")
+        print(f"Agent {agent_name}'s Interface MAC: {agent_interface_mac}")
 
-    try:
-        while time.time() < end_time:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        sniffer.stop_and_wait()
+        # Generate a random duration between 2 to 4 minutes
+        duration = random.uniform(2, 4)
+        end_time = datetime.now() + timedelta(minutes=duration)
 
-        # Randomly select an agent to execute the script
-        if random.choice([True, False]):
-            print(f"Agent on {interface} interface is executing the script.")
-            execute_script()
+        # Run the loop until the specified end time
+        while datetime.now() < end_time:
+            # Simulate code execution by doing some work
+            # (Replace this with the actual code execution logic)
+            time.sleep(1)  # Simulating work for 1 second
 
-def activate_agents(num_agents):
+    print(f"Agent {agent_name} finished executing code on {target_interface}.")
+
+
+# Function to run an agent
+def run_agent(agent_id):
+    while True:
+        # Choose a random target interface
+        target_interface = random.choice(TARGET_INTERFACES)
+
+        # Remove the used target interface
+        TARGET_INTERFACES.remove(target_interface)
+
+        # Execute code on the chosen interface
+        execute_code(agent_id, target_interface)
+
+        # Append the target interface back
+        TARGET_INTERFACES.append(target_interface)
+
+# Main function
+def main():
+    # Create and start threads for each agent
     threads = []
-
-    for i in range(min(num_agents, len(INTERFACES))):
-        interface = INTERFACES[i]
-        duration = random.uniform(120, 240)  # Random duration between 2 to 4 minutes
-        start_delay = random.uniform(0, 120)  # Random start delay within the first 2 minutes
-
-        # Create a thread for each interface with a random start delay and duration
-        thread = threading.Timer(start_delay, sniff_packets, args=(interface, duration))
+    for agent_id in range(num_agents):
+        thread = threading.Thread(target=run_agent, args=(agent_id,))
         threads.append(thread)
         thread.start()
 
-    return threads
-
-def main():
     try:
-        num_agents = int(input("Enter the number of agents to activate: "))
-    except ValueError:
-        print("Invalid input. Please enter a valid number.")
-        return
-
-    if num_agents <= 0:
-        print("Number of agents must be greater than zero.")
-        return
-
-    threads = activate_agents(num_agents)
-
-    try:
-        # Keep the main program running
-        while True:
-            time.sleep(1)
+        # Run the agents for an hour
+        time.sleep(60 * 60)
     except KeyboardInterrupt:
-        # Stop the sniffers when Ctrl+C is pressed
-        print("Stopping sniffers...")
-        for thread in threads:
-            thread.cancel()
+        print("\nReceived KeyboardInterrupt. Stopping agents...")
+        sys.exit()
 
+    # Stop the agents by joining the threads
+    for thread in threads:
+        thread.join()
+
+# Entry point
 if __name__ == "__main__":
     main()
