@@ -52,6 +52,11 @@ def execute_code(agent_id, target_interface): # ARP-poison script: https://githu
 
 # Function to run an agent
 def run_agent(agent_id):
+
+    # Introduce a random delay before starting each agent
+    random_start_delay = random.uniform(120, 240)  # Random delay between 0 to 60 seconds
+    time.sleep(random_start_delay)
+
     while True:
         # Choose a random target interface
         target_interface = random.choice(TARGET_INTERFACES)
