@@ -91,6 +91,7 @@ def main():
     parser.add_argument('--output', required=True, help='Path to save or load the model.')
     parser.add_argument('--train', action='store_true', help='Train the model if specified.')
     parser.add_argument('--model_input', help='Path to the pre-trained model for prediction (ignored if --train is set).')
+    parser.add_argument('-h', '--help', action='help', default=argparse.SUPPRESS, help='Show this help message and exit.')
 
     args = parser.parse_args()
 

