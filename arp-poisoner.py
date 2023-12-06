@@ -5,7 +5,10 @@ import time
 import sys
 import signal
 import os
+from scapy.all import *
 from datetime import datetime, timedelta
+
+run_time_minutes = 10
 
 INTERFACES = ['Melchior', 'Balthasar', 'Casper']
 TARGET_INTERFACES = ['Maria', 'Rose', 'Sina']
@@ -19,9 +22,9 @@ agents_info = {
 
 # Data structure for targets
 targets_info = {
-    'Maria': {'target_ip':'10.21.0.11','target_mac':'CE:32:51:9F:81:02'},
-    'Rose':  {'target_ip':'10.21.0.12','target_mac':'12:45:6C:CD:58:D6'},
-    'Sina':  {'target_ip':'10.21.0.13','target_mac':'B2:DA:BF:0C:ED:AB'}
+    'Maria': {'target_ip':'10.21.0.16','target_mac':'CE:32:51:9F:81:02'},
+    'Rose':  {'target_ip':'10.21.0.17','target_mac':'12:45:6C:CD:58:D6'},
+    'Sina':  {'target_ip':'10.21.0.18','target_mac':'B2:DA:BF:0C:ED:AB'}
 }
 
 # Number of agents
@@ -55,7 +58,6 @@ def execute_code(agent_id, target_interface): # ARP-poison script: https://githu
             print(f"Agent {agent_name} is running the following command: {' '.join(command)}")
             print(datetime.now())
             process = subprocess.Popen(command, shell=True, preexec_fn=os.setsid)
-            #os.killpg(os.getpgid(process.pid),signal.SIGTERM)
 
         except subprocess.CalledProcessError as e:
             print(f"Agent {agent_name} failed to execute the command: {' '.join(command)}")
@@ -69,10 +71,18 @@ def execute_code(agent_id, target_interface): # ARP-poison script: https://githu
                 os.killpg(os.getpgid(process.pid),signal.SIGTERM)
                 return
 
-def benign_arp_forger():
-    print("stuff")
+def benign_arp_forger(agent_name, target_interface):
 
-
+    targetip = targets_info[target_interface]['target_ip']
+    targetmac = targets_info[target_interface]['target_mac']
+    
+    arppkt = Ether()/ARP()
+    arppkt[ARP].hwsrc = targetmac
+    arppkt[ARP].psrc = targetip
+    arppkt[ARP].pdst = "10.21.0.5"
+    arppkt[Ether].hwdst = "DE:BC:50:A7:AD:9E"
+    sendp(arppkt, iface="eth0", verbose=0)
+    print(f"{agent_name}sending forged arp packet to {target_interface}")
 
 
 # Function to run an agent
@@ -83,13 +93,6 @@ def run_agent(agent_id):
         duration = random.uniform(2, 4)
         end_time = datetime.now() + timedelta(minutes=duration)
 
-        if prev_target_interface != None:
-            while True :
-                if datetime.now() >= end_time:
-                    benign_arp_forger
-                    print(f"Agent {agent_name} finished forgeing arp packets on {prev_target_interface}.")
-                    break
-
         # Choose a random target interface
         target_interface = random.choice(TARGET_INTERFACES)
 
@@ -99,11 +102,13 @@ def run_agent(agent_id):
         # Execute code on the chosen interface
         execute_code(agent_id, target_interface)
 
+        while  datetime.now() < end_time:
+            benign_arp_forger(agent_name, target_interface)
+            time.sleep(30)
+        print(f"Agent {agent_name} finished forgeing arp packets on {prev_target_interface}.")
+        
         # Append the target interface back
         TARGET_INTERFACES.append(target_interface)
-
-        prev_target_interface = target_interface
-
 
 
 # Main function
@@ -117,16 +122,14 @@ def main():
 
     try:
         # Run the agents for an hour
-        time.sleep(60 * 10)
+        time.sleep(60 * run_time_minutes)
         print("Time's up! Stopping agents...")
+
         sys.exit()
     except KeyboardInterrupt:
         print("\nReceived KeyboardInterrupt. Stopping agents...")
         sys.exit()
 
-    # Stop the agents by joining the threads
-    for thread in threads:
-        thread.join()
 
 # Entry point
 if __name__ == "__main__":
