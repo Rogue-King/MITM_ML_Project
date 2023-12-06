@@ -8,7 +8,7 @@ def arp_packet_handler(packet):
             print(f"ARP Request: {arp_packet.psrc} ({arp_packet.hwsrc}) is looking for {arp_packet.pdst}")
 
 # Sniff ARP packets on a specific interface (e.g., "eth0") for a certain number of packets (count) and call arp_packet_handler for each ARP packet.
-//sniff(iface="eth0", count=10, prn=arp_packet_handler, filter="arp")
+sniff(iface="eth0", count=10, prn=arp_packet_handler, filter="arp")
 
 def extract_features_from_packet(packet):
     # Extract features from a packet

