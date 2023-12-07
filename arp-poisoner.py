@@ -100,7 +100,7 @@ def run_agent(agent_id):
         TARGET_INTERFACES.remove(target_interface)
 
         # Execute code on the chosen interface
-        execute_code(agent_id, target_interface)
+        # execute_code(agent_id, target_interface)
 
         while  datetime.now() < end_time:
             benign_arp_forger(agent_name, target_interface)
