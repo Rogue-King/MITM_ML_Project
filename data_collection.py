@@ -32,6 +32,7 @@ def create_benign_packets(target_mac, target_ip, router_mac):
     benign_arp_router[ARP].hwsrc = target_mac
     benign_arp_router[ARP].psrc = target_ip
     benign_arp_router[ARP].pdst = "10.21.0.5"
+    benign_arp_router[Ether].hwsrc = target_mac 
     benign_arp_router[Ether].hwdst = "FF:FF:FF:FF:FF:FF"
     benign_arp_router[ARP].op = 1
 
