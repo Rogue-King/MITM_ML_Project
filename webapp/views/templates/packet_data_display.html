@@ -27,17 +27,17 @@
   <table class="table table-bordered">
         <thead>
         <tr>
-            {% for heading in packet_table[0] %}
+            {% for heading in packet_table[0][:-1] %}
                 <th scope="col"> {{ heading }} </th>
             {% endfor %}
         </tr>
         </thead>
         <tbody>
             {% for packet in packet_table[1:] %}
-                <tr>
+                <tr {% if packet[-1] == 1 %} class="table-danger" {% endif %}>
                     <th scope="row">{{ packet[0] }}</th>
-                    {% for attribute in packet[1:] %}
-                        <td>{{ attribute }}</td>
+                    {% for attribute in packet[1:-1] %}
+                        <td> {{ attribute }}</td>
                     {% endfor %}
                 </tr>
             {% endfor %}
