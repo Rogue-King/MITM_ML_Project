@@ -1,0 +1,21 @@
+{% set navigation_bar = [
+    ('/', 'home', 'Home'),
+    ('/history/', 'history', 'Historical Data'),
+] -%}
+{% set active_page = active_page -%}
+
+    <nav class="navbar navbar-expand-sm bg-dark border-bottom border-body" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">MITM ML Project Demo</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    {% for href, id, caption in navigation_bar %}
+                    <a {% if id == active_page %} class="nav-link active" {% else %} class="nav-link" {% endif %} aria-current="page" href="{{ href|e }}">{{ caption|e }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </nav>

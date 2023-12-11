@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+{% set active_page = "home" %}
+{% block content %}
+  <div class="container-fluid">
+    <h3>The purpose of this webpage is to detect ARP Poisoning attacks based on packet data.</h3>
+    <h5>To get started, simply upload a .PCAP file or begin scanning the network</h5>
+  </div>
+  <section class="bg-white">
+    <div class="container">
+        <div class="text-center">
+          <p class="lead">Upload PCAP files here</p>
+        </div>
+        <div class="row justify-content-center">
+          <div class="col-md-8 text-center">
+              <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#upload-modal">
+              Upload
+              </button>
+          </div>
+        </div>
+    </div>
+  </section>
+  <div class="modal fade" id="upload-modal" tabindex="-1" aria-labelledby="modal-title" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="modal-title">Upload Files Here</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form onsubmit="showSpinner()" action="/upload" method="post" enctype="multipart/form-data">
+            <div class="modal-body">
+                  <label for="formFile" class="form-label">Accepts .pcap files</label>
+                  <input class="form-control" type="file" id="formFile", name="pcap-upload">
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" id="fileSubmit">Submit</button>
+
+              <button class="btn btn-primary" type="button" disabled id="spinnerBtn" style="display: none;">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span class="visually-hidden">Loading...</span>
+              </button>
+            </div>
+          </form>
+        </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='loading_button.js') }}"></script>
+{% endblock %}

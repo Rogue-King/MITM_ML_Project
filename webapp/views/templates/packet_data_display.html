@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+{% block content %}
+  <nav aria-label="Table Navigation">
+    <ul class="pagination justify-content-end">
+      {% if current_page > 1 %}
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('packet_viewer.default_page', page=current_page - 1) }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+      {% endif %}
+
+      {% for page_num in range(start_page, end_page) %}
+        <li class="page-item {% if page_num == current_page %} active {% endif %}"><a class="page-link" href="{{ url_for('packet_viewer.default_page', page=page_num) }}"> {{ page_num }} </a></li>
+      {% endfor %}
+      
+      {% if current_page != total_pages - 1 %} 
+        <li class="page-item">
+          <a class="page-link" href="{{ url_for('packet_viewer.default_page', page=current_page + 1) }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+
+  <table class="table table-bordered">
+        <thead>
+        <tr>
+            {% for heading in packet_table[0][:-1] %}
+                <th scope="col"> {{ heading }} </th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+            {% for packet in packet_table[1:] %}
+                <tr {% if packet[-1] == 1 %} class="table-danger" {% endif %}>
+                    <th scope="row">{{ packet[0] }}</th>
+                    {% for attribute in packet[1:-1] %}
+                        <td> {{ attribute }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <nav aria-label="Table Navigation">
+        <ul class="pagination justify-content-end">
+          {% if current_page > 1 %}
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('packet_viewer.default_page', page=current_page - 1) }}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+          {% endif %}
+
+          {% for page_num in range(start_page, end_page) %}
+            <li class="page-item {% if page_num == current_page %} active {% endif %}"><a class="page-link" href="{{ url_for('packet_viewer.default_page', page=page_num) }}"> {{ page_num }} </a></li>
+          {% endfor %}
+          
+          {% if current_page != total_pages - 1 %} 
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('packet_viewer.default_page', page=current_page + 1) }}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+    </nav>
+{% endblock %}
