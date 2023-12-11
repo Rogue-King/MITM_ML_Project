@@ -37,7 +37,7 @@ The application requires the following applications
 
   For Debian-based (Ubuntu) Systems:
   ```sh
-  sudo apt-get install -y python3
+  sudo apt install -y python3
   sudo apt install -y python3-pip
   ```
     
@@ -72,7 +72,6 @@ _Here's how to utilize the application._
 4. Install the required packages
    ```sh
    pip install -r requirements.txt
-   pip install lightning
    ```
 
 5. Run the Flask Webserver
