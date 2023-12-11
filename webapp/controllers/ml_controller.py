@@ -7,7 +7,8 @@ from webapp.models.LSTM_model import LSTMNN
 
 def init_model():
     model = LSTMNN()
-    model.load_state_dict(torch.load('webapp/models/LSTM_model.pt'))
+    device = torch.device('cpu')
+    model.load_state_dict(torch.load('webapp/models/LSTM_model.pt', map_location=device))
     model.eval()
 
     return model
