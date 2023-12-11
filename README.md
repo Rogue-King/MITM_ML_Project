@@ -59,24 +59,31 @@ _Here's how to utilize the application._
    git clone https://github.com/Rogue-King/MITM_ML_Project.git
    ```
 
-2. Install the required packages
-   ```sh
-   pip -r requirements.txt
-   ```
-
-3. Create a Python Virtual Environment
+2. Create a Python Virtual Environment
    ```sh
    python3 -m venv .venv
    ```
 
-4. Enable the Virtual Environment
+3. Enable the Virtual Environment
    ``` sh
    source .venv/bin/activate
    ```
 
-5. Run the Flask Webserver
+4. Install the required packages
+   ```sh
+   pip install -r requirements.txt
+   pip install lightning
    ```
+
+5. Run the Flask Webserver
+   ```sh
    flask run
+   ```
+
+   or
+
+   ```sh
+   python3 app.py
    ```
 
 _Once Finished_
