@@ -13,35 +13,6 @@ from torch.utils.data import DataLoader, TensorDataset
 
 from common import print_statistics
 
-
-# class YourDataModule(pl.LightningDataModule):
-#     def __init__(self, dataset1, dataset2, batch_size):
-#         super(YourDataModule, self).__init__()
-#         self.dataset1 = dataset1
-#         self.dataset2 = dataset2
-#         self.dataset3 = dataset3
-#         self.batch_size = 32
-
-#     def prepare_data(self):
-#         # Download or preprocess data here (runs only on 1 GPU)
-#         pass
-
-#     def setup(self, stage=None):
-#         # Assign train and validation datasets here
-#         if stage == 'fit' or stage is None:
-#             self.train_dataset = YourDataset(self.dataset1)
-#             self.val_dataset = YourDataset(self.dataset2)
-
-#     def train_dataloader(self):
-#         return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True)
-
-#     def val_dataloader(self):
-#         return DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=False)
-
-
-
-
-
 # Step 1: Data Preparation
 # Loading the training data
 current_dir = os.getcwd()
