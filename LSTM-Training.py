@@ -17,8 +17,8 @@ from common import print_statistics
 # Loading the training data
 current_dir = os.getcwd()
 
-train_data = pd.read_csv(current_dir + '/ARP_Data/Labelled_CSV_Large/Melchior_training_arp_data_1.csv', header=None).sample(frac=1)
-X = train_data.iloc[:, :-1].values
+train_data = pd.read_csv(current_dir + '/ARP_Data/Labelled_CSV_Large/ARP_Large.csv', header=None).sample(frac=1)# Melchior_training_arp_data_1.csv
+X = train_data.iloc[:, :-1].values 
 Y = train_data.iloc[:, -1].values
 
 # Scaling the feature data
@@ -68,7 +68,7 @@ trainer.fit(model, train_loader)
 
 # Step 4: Testing the Model
 # Loading the test data
-test_data = pd.read_csv(current_dir + '/ARP_Data/Labelled_CSV_Large/Melchior_training_arp_data_1.csv', header=None)
+test_data = pd.read_csv(current_dir + '/ARP_Data/Labelled_CSV_Large/ARP_Large.csv', header=None)
 X_test = test_data.iloc[:, :-1].values
 Y_test = test_data.iloc[:, -1].values
 
@@ -95,8 +95,8 @@ precision = precision_score(Y_test, predictions_bin)
 accuracy = accuracy_score(Y_test, predictions_bin)
 TN, FP, FN, TP = confusion_matrix(Y_test, predictions_bin).ravel()
 
-print_statistics(tp=TP, fp=FP, tn=TN, fn=FN)
+print_statistics(tp=TP, fp=FP, tn=TN, fn=FN) #TN is true negative, FP is false positive, FN is false negative, TP is true positive
 
 #save model
-torch.save(model.state_dict(), current_dir + '/ml_models/LSTM_model.pt')
+torch.save(model.state_dict(), current_dir + '/ml_models/LSTM_Large_model.pt')
 
