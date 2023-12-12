@@ -97,5 +97,9 @@ _Once Finished_
 
 <!-- USAGE EXAMPLES -->
 ## Usage
+To use the web application, follow the instructions found in the main page.
 
-Placeholder
+Upload a packet capture (PCAP) file, then press submit. Sample PCAP files can be found under the ARP_DATA folder. You will then be redirected to a different page, showcasing the model's predictions for potential ARP Poisoning packets. 
+
+Below as an example output of the application:
+![example](./images/Example.png)
