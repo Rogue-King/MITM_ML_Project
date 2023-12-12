@@ -11,13 +11,14 @@ from sklearn.preprocessing import StandardScaler
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
+
 from common import print_statistics
 
 # Step 1: Data Preparation
 # Loading the training data
 current_dir = os.getcwd()
 
-train_data = pd.read_csv(current_dir + '/ARP_Data/Labelled_CSV_Large/Melchior_training_arp_data_1.csv', header=None).sample(frac=1)
+train_data = pd.read_csv(current_dir + '/Melchior_training_arp_data_1_sequence.csv', header=None)
 X = train_data.iloc[:, :-1].values
 Y = train_data.iloc[:, -1].values
 
@@ -49,6 +50,16 @@ class LSTMNN(L.LightningModule):
         x, y = batch
         y_hat = self(x)
         loss = nn.BCELoss()(y_hat, y.view(-1, 1).float())
+        self.log('train_loss', loss)
+
+        # output_i = self.foward(x[0])
+        # loss = (output_i - y)**2
+        # self.log('train_loss', loss)
+        # if (y == 0):
+        #     self.log('out_0', loss)
+        # else: 
+        #     self.log('out_1', loss)
+
         return loss
 
     def configure_optimizers(self):
@@ -62,13 +73,22 @@ model = LSTMNN()
 train_dataset = TensorDataset(torch.tensor(X_scaled), torch.tensor(Y))
 train_loader = DataLoader(train_dataset, batch_size=32)
 
-# Initializing a trainer and training the model
+# trainer = L.Trainer(default_root_dir=current_dir + '/ml_models/LSTM_model.ckpt')
 trainer = L.Trainer(max_epochs=10)
+# Initializing a trainer and training the model
+# best_model_path = 'lightning_logs/version_0/checkpoints/epoch=9-step=4350.ckpt'
+# # print(best_model_path)
+
+
+# path_to_best_checkpoint = trainer.checkpoint_callback.best_model_path
+
 trainer.fit(model, train_loader)
+
+
 
 # Step 4: Testing the Model
 # Loading the test data
-test_data = pd.read_csv(current_dir + '/ARP_Data/Labelled_CSV_Large/Melchior_training_arp_data_1.csv', header=None)
+test_data = pd.read_csv(current_dir + '/Balthasar_training_arp_data_min_sequence.csv', header=None)
 X_test = test_data.iloc[:, :-1].values
 Y_test = test_data.iloc[:, -1].values
 
